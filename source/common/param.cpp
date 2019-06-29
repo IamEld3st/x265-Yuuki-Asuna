@@ -676,7 +676,7 @@ int x265_param_default_preset(x265_param* param, const char* preset, const char*
             param->bEnableWeightedBiPred = 1;
             param->rc.aqMode = 3;
             param->bAQMotion = 1;
-            param->rc.rfConstant = 20;
+            param->rc.rfConstant = 28;
             param->psyRd = 1.5;   //down
             param->psyRdoq = 0.8; //down
             if (param->maxNumReferences < 2) param->maxNumReferences = 2;
