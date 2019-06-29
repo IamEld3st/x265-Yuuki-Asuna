@@ -647,20 +647,19 @@ int x265_param_default_preset(x265_param* param, const char* preset, const char*
                 }
             }
         }
-	else if (!strcmp(tune, "anime"))
-	{
-            param->bframes = 8;
+	else if (!strncmp(tune, "anime", 5))
+        {
             param->bEnableAMP = 0;
             param->bEnableRectInter = 0;
             param->rc.aqStrength = 0.8; //down from 1.0
-            if (param->rdLevel < 6) param->rdLevel = 6;
+            if (param->rdLevel < 4) param->rdLevel = 4;
             param->rdoqLevel = 2; //force rdoq to be effective
             param->bEnableSAO = 0;
             param->bEnableStrongIntraSmoothing = 0;
             if (param->bframes + 1 < param->lookaheadDepth) param->bframes++;
-            if (param->bframes + 1 < param->lookaheadDepth) param->bframes++; //from tune animation
-            param->tuQTMaxInterDepth = 3;
-            param->tuQTMaxIntraDepth = 3;
+            if (param->bframes + 1 < param->lookaheadDepth)  param->bframes++; //from tune animation
+            if (param->tuQTMaxInterDepth > 3) param->tuQTMaxInterDepth--;
+            if (param->tuQTMaxIntraDepth > 3) param->tuQTMaxIntraDepth--;
             if (param->maxNumMergeCand > 3) param->maxNumMergeCand--;
             if (param->subpelRefine < 3) param->subpelRefine = 3;
             param->keyframeMin = 1;
@@ -671,25 +670,38 @@ int x265_param_default_preset(x265_param* param, const char* preset, const char*
             param->maxCUSize = 32;
             param->maxTUSize = 32;
             param->rc.qgSize = 8;
-            param->cbQpOffset = -2; //better chroma quality to compensate 420 subsampling
-            param->crQpOffset = -2; //better chroma quality to compensate 420 subsampling
+            param->cbQpOffset = -2;   //better chroma quality to compensate 420 subsampling
+            param->crQpOffset = -2;   //better chroma quality to compensate 420 subsampling
             param->rc.pbFactor = 1.2; //down from 1.3
             param->bEnableWeightedBiPred = 1;
-	    param->rc.rfConstant = 28;
-            param->psyRd = 1.5; //down
+            param->rc.aqMode = 3;
+            param->bAQMotion = 1;
+            param->rc.rfConstant = 20;
+            param->psyRd = 1.5;   //down
             param->psyRdoq = 0.8; //down
-	    if (param->maxNumReferences < 5) param->maxNumReferences = 5;
-            if (param->subpelRefine < 4) param->subpelRefine = 4;
+            if (param->maxNumReferences < 2) param->maxNumReferences = 2;
+            if (param->subpelRefine < 3) param->subpelRefine = 3;
             if (param->lookaheadDepth < 60) param->lookaheadDepth = 60;
             param->searchRange = 38; //down from 57
-	    param->rc.aqMode = 3;
-	    param->bAQMotion = 1;
-	    param->bEnableEarlySkip = 0;
-            param->searchMethod = X265_STAR_SEARCH;
-            param->limitModes = 1;
-            param->lookaheadSlices = 0; // disabled for best quality
-            param->limitTU = 4;
-	}
+            if (strstr(tune, "++"))
+            {
+                param->bEnableEarlySkip = 0;
+                param->bEnableWeightedBiPred = 1;
+                param->bframes = 8;
+                param->tuQTMaxInterDepth = 3;
+                param->tuQTMaxIntraDepth = 3;
+                param->maxNumMergeCand = 4;
+                param->searchMethod = X265_STAR_SEARCH;
+                param->maxNumReferences = 5;
+                param->limitModes = 1;
+                param->lookaheadSlices = 0; // disabled for best quality
+                param->limitTU = 4;
+                if (param->maxNumReferences < 3)  param->maxNumReferences = 3;
+                if (param->subpelRefine < 3) param->subpelRefine = 3;
+                param->bIntraInBFrames = 1;
+                param->bEnableRectInter = 1;
+            }
+        }
         else if (!strcmp(tune, "vmaf"))  /*Adding vmaf for x265 + SVT-HEVC integration support*/
         {
             /*vmaf is under development, currently x265 won't support vmaf*/
